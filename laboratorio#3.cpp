@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-// Definición de pines para botones y LEDs
+
 #define boton_mas 12
 #define boton_menos 14
 #define boton_clear 33
@@ -13,13 +13,10 @@
 #define led_c 23
 #define led_d 25
 #define led_alerta 26
-
-// Variables volátiles para los contadores
 volatile int cuenta_manual = 0;
 volatile int cuenta_auto = 0;
 hw_timer_t * temporizador = NULL;
 
-// Función para actualizar los LEDs manuales
 void actualizar_leds_manual() {
   digitalWrite(led_uno, (cuenta_manual & 0x01) ? HIGH : LOW);
   digitalWrite(led_dos, (cuenta_manual & 0x02) ? HIGH : LOW);
@@ -27,7 +24,6 @@ void actualizar_leds_manual() {
   digitalWrite(led_cuatro, (cuenta_manual & 0x08) ? HIGH : LOW);
 }
 
-// Función para actualizar los LEDs automáticos
 void actualizar_leds_auto() {
   digitalWrite(led_a, (cuenta_auto & 0x01) ? HIGH : LOW);
   digitalWrite(led_b, (cuenta_auto & 0x02) ? HIGH : LOW);
@@ -35,32 +31,28 @@ void actualizar_leds_auto() {
   digitalWrite(led_d, (cuenta_auto & 0x08) ? HIGH : LOW);
 }
 
-// Interrupción para el botón de incremento
 void IRAM_ATTR manejar_mas() {
-  cuenta_manual = (cuenta_manual + 1) % 16; // Contador de 4 bits
+  cuenta_manual = (cuenta_manual + 1) % 16; 
   actualizar_leds_manual();
 }
 
-// Interrupción para el botón de decremento
 void IRAM_ATTR manejar_menos() {
-  cuenta_manual = (cuenta_manual - 1 + 16) % 16; // Evitar valores negativos
+  cuenta_manual = (cuenta_manual - 1 + 16) % 16;
   actualizar_leds_manual();
 }
 
-// Interrupción del temporizador
 void IRAM_ATTR manejar_tiempo() {
   cuenta_auto = (cuenta_auto + 1) % 16;
   actualizar_leds_auto();
   if (cuenta_auto == cuenta_manual) {
-    digitalWrite(led_alerta, !digitalRead(led_alerta)); // Cambiar el estado del pin
-    cuenta_auto = 0; // Reiniciar el contador del temporizador
+    digitalWrite(led_alerta, !digitalRead(led_alerta)); 
+    cuenta_auto = 0; 
   }
 }
 
-// Interrupción para el botón de reinicio
 void IRAM_ATTR manejar_clear() {
   cuenta_auto = 0;
-  timerAlarmWrite(temporizador, 250000, true); // Reiniciar el temporizador
+  timerAlarmWrite(temporizador, 250000, true);
 }
 
 void setup() {
@@ -78,11 +70,11 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(boton_mas), manejar_mas, FALLING);
   attachInterrupt(digitalPinToInterrupt(boton_menos), manejar_menos, FALLING);
-  touchAttachInterrupt(boton_clear, manejar_clear, 40); // El umbral se puede ajustar según sea necesario
+  touchAttachInterrupt(boton_clear, manejar_clear, 40); 
 
-  temporizador = timerBegin(0, 80, true); // 80 prescaler, incrementa cada 1us
+  temporizador = timerBegin(0, 80, true); 
   timerAttachInterrupt(temporizador, &manejar_tiempo, true);
-  timerAlarmWrite(temporizador, 250000, true); // 250ms
+  timerAlarmWrite(temporizador, 250000, true); 
   timerAlarmEnable(temporizador);
 
   actualizar_leds_manual();
@@ -90,5 +82,5 @@ void setup() {
 }
 
 void loop() {
-  // No se necesita hacer nada aquí
+  
 }
