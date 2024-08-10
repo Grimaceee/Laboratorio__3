@@ -1,6 +1,5 @@
 #include <Arduino.h>
 
-
 #define boton_mas 12
 #define boton_menos 14
 #define boton_clear 33
